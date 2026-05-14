@@ -59,13 +59,6 @@ def _hash_password(pw: str) -> str:
 
 
 def _check_credentials(username: str, password: str) -> bool:
-    """
-    ตรวจสอบ credentials จาก st.secrets
-    รูปแบบ secrets.toml:
-        [credentials]
-        admin   = "your_password"
-        analyst = "another_password"
-    """
     try:
         stored = st.secrets["credentials"].get(username)
         if stored is None:
@@ -76,7 +69,6 @@ def _check_credentials(username: str, password: str) -> bool:
             return True
         return False
     except Exception:
-        # Fallback demo account ถ้าไม่มี secrets
         return username == "admin" and password == "admin1234"
 
 
@@ -130,7 +122,6 @@ if not st.session_state["authenticated"]:
 # MAIN APP
 # ============================================================
 
-# --- Logout button ที่ sidebar ---
 with st.sidebar:
     st.markdown("---")
     user_label = st.session_state.get("current_user", "User")
@@ -213,14 +204,13 @@ page = st.sidebar.radio(
     help="เลือก Brand และจำนวน SKU ที่ต้องการวิเคราะห์"
 )
 
-# FIX: sort แบบ numeric เพื่อให้ '202619' > '202618' ถูกต้องเสมอ
 available_weeks = sorted(
     df_raw["week_id"].unique(),
     key=lambda x: int(x),
     reverse=True
 )
-default_weeks   = available_weeks[:8] if len(available_weeks) >= 8 else available_weeks
-selected_weeks  = st.sidebar.multiselect(
+default_weeks  = available_weeks[:8] if len(available_weeks) >= 8 else available_weeks
+selected_weeks = st.sidebar.multiselect(
     "Select Week ID:",
     options=available_weeks,
     default=default_weeks,
@@ -255,8 +245,14 @@ if not selected_weeks:
     st.stop()
 
 # --- 7. Build Heatmap ---
-n_stores = len(selected_stores)
-row_h    = max(200, n_stores * 22)
+n_stores    = len(selected_stores)
+n_weeks     = len(selected_weeks)
+n_skus      = len(target_skus)
+
+# FIX: เพิ่มความสูงต่อ row และเพิ่ม bottom margin สำหรับ X-axis label ที่หมุน
+row_h       = max(220, n_stores * 24)
+# bottom margin ใหญ่ขึ้นเพื่อรองรับ label ที่ถูก rotate 45°
+bottom_margin = 120 + (n_weeks * 4)
 
 subplot_titles = [
     f"SKU: {sid}  —  {sku_names.get(sid, 'Unknown')}"
@@ -264,10 +260,10 @@ subplot_titles = [
 ]
 
 fig = make_subplots(
-    rows=len(target_skus),
+    rows=n_skus,
     cols=1,
     subplot_titles=subplot_titles,
-    vertical_spacing=0.04,
+    vertical_spacing=0.06,   # FIX: เพิ่มช่องว่างระหว่าง subplot
 )
 
 df_filtered = df_raw[
@@ -275,7 +271,6 @@ df_filtered = df_raw[
     df_raw["store_id"].isin(selected_stores)
 ].copy()
 
-# FIX: sort แบบ numeric ไม่ใช่ lexicographic
 sorted_weeks = sorted(selected_weeks, key=lambda x: int(x))
 
 for i, sku in enumerate(target_skus):
@@ -294,7 +289,7 @@ for i, sku in enumerate(target_skus):
     h_df = (
         grid.pivot(index="store_display", columns="week_id", values="status")
         .fillna(0)
-        .reindex(columns=sorted_weeks)   # FIX: บังคับลำดับ column ตาม sorted_weeks
+        .reindex(columns=sorted_weeks)
     )
 
     sales_pivot = (
@@ -319,28 +314,47 @@ for i, sku in enumerate(target_skus):
             showscale=False,
             text=hover_text,
             hovertemplate="%{text}<extra></extra>",
-            xgap=2,
-            ygap=1,
+            xgap=3,   # FIX: เพิ่ม gap ระหว่าง cell แนวนอน
+            ygap=2,   # FIX: เพิ่ม gap ระหว่าง cell แนวตั้ง
         ),
         row=i + 1,
         col=1,
     )
 
-    # FIX: บังคับ Plotly ไม่ให้ re-sort แกน X เอง
+    # FIX: หมุน X-axis label 45° + บังคับลำดับ + ขยาย tick font
     fig.update_xaxes(
         categoryorder="array",
         categoryarray=sorted_weeks,
+        tickangle=45,            # หมุน label ไม่ซ้อนกัน
+        tickfont=dict(size=12),  # ขนาด font ที่อ่านง่าย
+        tickmode="array",
+        tickvals=sorted_weeks,
+        ticktext=sorted_weeks,
+        showgrid=False,
+        row=i + 1,
+        col=1,
+    )
+
+    # FIX: ขยาย Y-axis font ให้อ่านง่ายขึ้น
+    fig.update_yaxes(
+        tickfont=dict(size=11),
+        showgrid=False,
         row=i + 1,
         col=1,
     )
 
 fig.update_layout(
-    height=row_h * len(target_skus) + 120,
-    margin=dict(l=320, t=80, r=40, b=60),
+    height=row_h * n_skus + bottom_margin,
+    margin=dict(
+        l=340,               # ซ้าย: เผื่อ store name ยาว
+        t=80,
+        r=40,
+        b=bottom_margin,     # FIX: bottom ใหญ่ขึ้นรองรับ label ที่หมุน
+    ),
     showlegend=False,
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(0,0,0,0)",
-    font=dict(size=11),
+    font=dict(size=12),
 )
 
 st.plotly_chart(fig, use_container_width=True)
@@ -348,7 +362,7 @@ st.plotly_chart(fig, use_container_width=True)
 # --- 8. Summary Metrics ---
 st.markdown("---")
 col1, col2, col3 = st.columns(3)
-total_cells = len(target_skus) * len(selected_stores) * len(selected_weeks)
+total_cells = n_skus * len(selected_stores) * len(selected_weeks)
 sold_cells  = int(
     df_filtered[df_filtered["sku_id"].isin(target_skus)]["sales"]
     .gt(0).sum()
