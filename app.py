@@ -23,7 +23,6 @@ LOGIN_CSS = """
 
 [data-testid="stAppViewContainer"] { background: #0d0f14; }
 [data-testid="stHeader"] { background: transparent; }
-
 section[data-testid="stMain"] { color: #e2e8f0; }
 
 .stTextInput > label {
@@ -74,19 +73,15 @@ def _check_credentials(username: str, password: str) -> bool:
 
 def show_login_page():
     st.markdown(LOGIN_CSS, unsafe_allow_html=True)
-
     col_l, col_m, col_r = st.columns([1, 1, 1])
     with col_m:
         st.markdown("## 📊 SKU Monitor")
         st.markdown("**Nongshim · Samyang** — Sign in to continue")
         st.markdown("---")
-
         if st.session_state.get("login_failed"):
             st.error("⚠️ Incorrect username or password")
-
         username = st.text_input("Username", placeholder="Enter your username", key="login_user")
         password = st.text_input("Password", placeholder="••••••••", type="password", key="login_pass")
-
         if st.button("Sign In →", use_container_width=True):
             if _check_credentials(username.strip(), password):
                 st.session_state["authenticated"] = True
@@ -96,7 +91,6 @@ def show_login_page():
             else:
                 st.session_state["login_failed"] = True
                 st.rerun()
-
         st.caption("🔒 Secured · Internal Use Only")
 
 
@@ -245,14 +239,12 @@ if not selected_weeks:
     st.stop()
 
 # --- 7. Build Heatmap ---
-n_stores    = len(selected_stores)
-n_weeks     = len(selected_weeks)
-n_skus      = len(target_skus)
+n_stores = len(selected_stores)
+n_weeks  = len(selected_weeks)
+n_skus   = len(target_skus)
 
-# FIX: เพิ่มความสูงต่อ row และเพิ่ม bottom margin สำหรับ X-axis label ที่หมุน
-row_h       = max(220, n_stores * 24)
-# bottom margin ใหญ่ขึ้นเพื่อรองรับ label ที่ถูก rotate 45°
-bottom_margin = 120 + (n_weeks * 4)
+row_h         = max(220, n_stores * 24)
+bottom_margin = 140
 
 subplot_titles = [
     f"SKU: {sid}  —  {sku_names.get(sid, 'Unknown')}"
@@ -263,7 +255,7 @@ fig = make_subplots(
     rows=n_skus,
     cols=1,
     subplot_titles=subplot_titles,
-    vertical_spacing=0.06,   # FIX: เพิ่มช่องว่างระหว่าง subplot
+    vertical_spacing=0.06,
 )
 
 df_filtered = df_raw[
@@ -284,11 +276,14 @@ for i, sku in enumerate(target_skus):
         lambda sid: store_map.get(sid, "Unknown")
     )
     grid = grid.merge(sku_df, on=["week_id", "store_id"], how="left")
+
+    # FIX: บังคับ status เป็น integer 0 หรือ 1 เท่านั้น ไม่มีค่ากลาง
     grid["status"] = (grid["sales"].fillna(0) > 0).astype(int)
 
     h_df = (
         grid.pivot(index="store_display", columns="week_id", values="status")
         .fillna(0)
+        .astype(int)                        # FIX: บังคับ dtype เป็น int ทั้ง DataFrame
         .reindex(columns=sorted_weeks)
     )
 
@@ -307,26 +302,29 @@ for i, sku in enumerate(target_skus):
 
     fig.add_trace(
         go.Heatmap(
-            z=h_df.values,
+            z=h_df.values.tolist(),         # FIX: แปลงเป็น plain list ป้องกัน numpy dtype ทำสีเพี้ยน
             x=h_df.columns.tolist(),
             y=h_df.index.tolist(),
             colorscale=[[0, "#e74c3c"], [1, "#27ae60"]],
+            zmin=0,                         # FIX: ล็อค range สีทุก subplot ให้เท่ากัน
+            zmax=1,                         # FIX: ป้องกันสีเพี้ยนเมื่อ SKU ทั้งหมด sold หมด
             showscale=False,
             text=hover_text,
             hovertemplate="%{text}<extra></extra>",
-            xgap=3,   # FIX: เพิ่ม gap ระหว่าง cell แนวนอน
-            ygap=2,   # FIX: เพิ่ม gap ระหว่าง cell แนวตั้ง
+            xgap=3,
+            ygap=2,
         ),
         row=i + 1,
         col=1,
     )
 
-    # FIX: หมุน X-axis label 45° + บังคับลำดับ + ขยาย tick font
+    # FIX: ใช้ tickangle=-45 + automargin=True ป้องกัน label ซ้อนทุกกรณี
     fig.update_xaxes(
         categoryorder="array",
         categoryarray=sorted_weeks,
-        tickangle=45,            # หมุน label ไม่ซ้อนกัน
-        tickfont=dict(size=12),  # ขนาด font ที่อ่านง่าย
+        tickangle=-45,
+        automargin=True,                    # FIX: Plotly ขยาย margin ให้อัตโนมัติ
+        tickfont=dict(size=12),
         tickmode="array",
         tickvals=sorted_weeks,
         ticktext=sorted_weeks,
@@ -335,10 +333,10 @@ for i, sku in enumerate(target_skus):
         col=1,
     )
 
-    # FIX: ขยาย Y-axis font ให้อ่านง่ายขึ้น
     fig.update_yaxes(
         tickfont=dict(size=11),
         showgrid=False,
+        automargin=True,                    # FIX: Y-axis automargin ด้วย กัน store name ถูกตัด
         row=i + 1,
         col=1,
     )
@@ -346,10 +344,10 @@ for i, sku in enumerate(target_skus):
 fig.update_layout(
     height=row_h * n_skus + bottom_margin,
     margin=dict(
-        l=340,               # ซ้าย: เผื่อ store name ยาว
+        l=360,
         t=80,
         r=40,
-        b=bottom_margin,     # FIX: bottom ใหญ่ขึ้นรองรับ label ที่หมุน
+        b=bottom_margin,
     ),
     showlegend=False,
     paper_bgcolor="rgba(0,0,0,0)",
