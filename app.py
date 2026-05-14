@@ -163,11 +163,34 @@ section[data-testid="stMain"] *     { color: #f0f4f8; font-family: 'DM Sans', sa
     color: #f0f4f8 !important;
 }
 
-/* Sidebar file uploader */
+/* Sidebar file uploader — outer wrapper */
 [data-testid="stSidebar"] [data-testid="stFileUploader"] {
     background: #1a1f2e !important;
+    border-radius: 8px !important;
+}
+
+/* กรอบด้านในที่เป็นสีขาว — section + drop zone */
+[data-testid="stSidebar"] [data-testid="stFileUploader"] section,
+[data-testid="stSidebar"] [data-testid="stFileUploader"] section > div,
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] {
+    background: #0d0f14 !important;
     border: 1px dashed #5a7aa8 !important;
     border-radius: 8px !important;
+    color: #a8b8cc !important;
+}
+
+/* ปุ่ม Upload ข้างใน */
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] button {
+    background: #1a1f2e !important;
+    border: 1px solid #5a7aa8 !important;
+    color: #e8edf2 !important;
+    border-radius: 6px !important;
+}
+
+/* ข้อความ 200MB per file */
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] small,
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] span {
+    color: #6b7f99 !important;
 }
 
 /* Sidebar sign-out button */
@@ -493,4 +516,3 @@ for annotation in fig.layout.annotations:
     annotation.font.color = "#ffffff"
     annotation.font.size  = 13
 
-st.plotly_chart(fig, use_container_width=True)
