@@ -483,3 +483,5 @@ avail_rate   = sold_cells / total_cells * 100 if total_cells > 0 else 0
 col1.metric("Total SKU-Store-Week Cells", f"{total_cells:,}")
 col2.metric("Cells with Sales",           f"{sold_cells:,}")
 col3.metric("Availability Rate",          f"{avail_rate:.1f}%")
+
+# test
