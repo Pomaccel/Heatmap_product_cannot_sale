@@ -19,153 +19,36 @@ st.set_page_config(
 
 LOGIN_CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600&display=swap');
 
-/* ── Reset & base ── */
-[data-testid="stAppViewContainer"] {
-    background: #0d0f14;
-}
+[data-testid="stAppViewContainer"] { background: #0d0f14; }
 [data-testid="stHeader"] { background: transparent; }
-[data-testid="stToolbar"] { display: none; }
 
-/* ── Login wrapper ── */
-.login-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 88vh;
-    font-family: 'DM Sans', sans-serif;
-}
+section[data-testid="stMain"] { color: #e2e8f0; }
 
-/* ── Card ── */
-.login-card {
-    background: #13161e;
-    border: 1px solid #1f2535;
-    border-radius: 16px;
-    padding: 48px 44px 40px;
-    width: 100%;
-    max-width: 420px;
-    box-shadow: 0 32px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03);
-}
-
-/* ── Brand bar ── */
-.login-brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 32px;
-}
-.login-brand-icon {
-    width: 38px; height: 38px;
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-    box-shadow: 0 4px 14px rgba(59,130,246,0.35);
-}
-.login-brand-name {
-    font-size: 15px; font-weight: 600;
-    color: #e2e8f0; letter-spacing: 0.01em;
-}
-.login-brand-sub {
-    font-size: 11px; color: #4a5568;
-    font-family: 'DM Mono', monospace;
-    letter-spacing: 0.05em; text-transform: uppercase;
-}
-
-/* ── Headline ── */
-.login-headline {
-    font-size: 22px; font-weight: 600;
-    color: #f1f5f9;
-    margin-bottom: 6px;
-    letter-spacing: -0.02em;
-}
-.login-sub {
-    font-size: 13.5px; color: #64748b;
-    margin-bottom: 28px;
-    line-height: 1.5;
-}
-
-/* ── Divider ── */
-.login-divider {
-    height: 1px; background: #1f2535;
-    margin-bottom: 28px;
-}
-
-/* ── Error banner ── */
-.login-error {
-    background: rgba(239,68,68,0.1);
-    border: 1px solid rgba(239,68,68,0.25);
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 13px; color: #fca5a5;
-    margin-bottom: 16px;
-    display: flex; align-items: center; gap: 8px;
-}
-
-/* ── Streamlit input overrides (inside card) ── */
 .stTextInput > label {
-    font-family: 'DM Sans', sans-serif !important;
-    font-size: 12.5px !important;
-    font-weight: 500 !important;
     color: #94a3b8 !important;
-    letter-spacing: 0.04em !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
     text-transform: uppercase !important;
-    margin-bottom: 4px !important;
+    letter-spacing: 0.06em !important;
 }
 .stTextInput > div > div > input {
-    background: #0d0f14 !important;
-    border: 1px solid #1f2535 !important;
+    background: #1a1f2e !important;
+    border: 1px solid #2d3748 !important;
     border-radius: 8px !important;
     color: #e2e8f0 !important;
-    font-family: 'DM Sans', sans-serif !important;
     font-size: 14px !important;
-    padding: 10px 14px !important;
-    transition: border-color 0.15s ease !important;
 }
-.stTextInput > div > div > input:focus {
-    border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 3px rgba(59,130,246,0.15) !important;
-}
-.stTextInput > div > div > input::placeholder { color: #334155 !important; }
-
-/* ── Login button ── */
 .stButton > button {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
-    color: #fff !important;
+    background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+    color: white !important;
     border: none !important;
     border-radius: 8px !important;
-    font-family: 'DM Sans', sans-serif !important;
-    font-size: 14px !important;
     font-weight: 600 !important;
-    letter-spacing: 0.02em !important;
-    padding: 11px 0 !important;
-    width: 100% !important;
-    margin-top: 8px !important;
-    cursor: pointer !important;
-    transition: opacity 0.15s ease, transform 0.1s ease !important;
+    font-size: 14px !important;
+    padding: 10px !important;
     box-shadow: 0 4px 14px rgba(37,99,235,0.4) !important;
-}
-.stButton > button:hover {
-    opacity: 0.92 !important;
-    transform: translateY(-1px) !important;
-}
-.stButton > button:active { transform: translateY(0) !important; }
-
-/* ── Footer note ── */
-.login-footer {
-    text-align: center;
-    margin-top: 20px;
-    font-size: 11.5px;
-    color: #2d3748;
-    font-family: 'DM Mono', monospace;
-    letter-spacing: 0.03em;
-}
-
-/* ── Logout button (top-right inside app) ── */
-.logout-btn {
-    position: fixed; top: 14px; right: 16px; z-index: 9999;
 }
 </style>
 """
@@ -180,57 +63,39 @@ def _check_credentials(username: str, password: str) -> bool:
     ตรวจสอบ credentials จาก st.secrets
     รูปแบบ secrets.toml:
         [credentials]
-        admin   = "hashed_or_plain_password"
+        admin   = "your_password"
         analyst = "another_password"
     """
     try:
         stored = st.secrets["credentials"].get(username)
         if stored is None:
             return False
-        # รองรับทั้ง plain text และ sha256 hash
         if stored == password:
             return True
         if stored == _hash_password(password):
             return True
         return False
     except Exception:
-        # ถ้าไม่มี secrets ให้ fallback demo account
+        # Fallback demo account ถ้าไม่มี secrets
         return username == "admin" and password == "admin1234"
 
 
 def show_login_page():
     st.markdown(LOGIN_CSS, unsafe_allow_html=True)
 
-    # Center column
-    _, col, _ = st.columns([1, 1.2, 1])
-    with col:
-        st.markdown('<div class="login-wrapper">', unsafe_allow_html=True)
-        st.markdown("""
-        <div class="login-card">
-            <div class="login-brand">
-                <div class="login-brand-icon">📊</div>
-                <div>
-                    <div class="login-brand-name">SKU Monitor</div>
-                    <div class="login-brand-sub">Nongshim · Samyang</div>
-                </div>
-            </div>
-            <div class="login-headline">Sign in to your account</div>
-            <div class="login-sub">Enter your credentials to access the dashboard.</div>
-            <div class="login-divider"></div>
-        </div>
-        """, unsafe_allow_html=True)
+    col_l, col_m, col_r = st.columns([1, 1, 1])
+    with col_m:
+        st.markdown("## 📊 SKU Monitor")
+        st.markdown("**Nongshim · Samyang** — Sign in to continue")
+        st.markdown("---")
 
-        # Error message
         if st.session_state.get("login_failed"):
-            st.markdown(
-                '<div class="login-error">⚠️ &nbsp;Incorrect username or password. Please try again.</div>',
-                unsafe_allow_html=True,
-            )
+            st.error("⚠️ Incorrect username or password")
 
         username = st.text_input("Username", placeholder="Enter your username", key="login_user")
         password = st.text_input("Password", placeholder="••••••••", type="password", key="login_pass")
 
-        if st.button("Sign In →"):
+        if st.button("Sign In →", use_container_width=True):
             if _check_credentials(username.strip(), password):
                 st.session_state["authenticated"] = True
                 st.session_state["current_user"]  = username.strip()
@@ -240,11 +105,7 @@ def show_login_page():
                 st.session_state["login_failed"] = True
                 st.rerun()
 
-        st.markdown(
-            '<div class="login-footer">🔒 &nbsp;Secured · Internal Use Only</div>',
-            unsafe_allow_html=True,
-        )
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.caption("🔒 Secured · Internal Use Only")
 
 
 def logout():
@@ -266,7 +127,7 @@ if not st.session_state["authenticated"]:
     st.stop()
 
 # ============================================================
-# MAIN APP (เหมือนเดิมทุกอย่าง — เพิ่มแค่ logout button)
+# MAIN APP
 # ============================================================
 
 # --- Logout button ที่ sidebar ---
@@ -360,8 +221,8 @@ selected_weeks   = st.sidebar.multiselect(
     default=default_weeks,
 )
 
-selected_group   = st.sidebar.selectbox("Select Store Group:", list(STORE_GROUPS.keys()))
-selected_stores  = STORE_GROUPS[selected_group]
+selected_group  = st.sidebar.selectbox("Select Store Group:", list(STORE_GROUPS.keys()))
+selected_stores = STORE_GROUPS[selected_group]
 
 # --- 5. Derived Config ---
 target_skus, brand_label = SKU_CONFIG[page]
@@ -473,15 +334,13 @@ st.plotly_chart(fig, use_container_width=True)
 # --- 8. Summary Metrics ---
 st.markdown("---")
 col1, col2, col3 = st.columns(3)
-total_cells  = len(target_skus) * len(selected_stores) * len(selected_weeks)
-sold_cells   = int(
+total_cells = len(target_skus) * len(selected_stores) * len(selected_weeks)
+sold_cells  = int(
     df_filtered[df_filtered["sku_id"].isin(target_skus)]["sales"]
     .gt(0).sum()
 )
-avail_rate   = sold_cells / total_cells * 100 if total_cells > 0 else 0
+avail_rate  = sold_cells / total_cells * 100 if total_cells > 0 else 0
 
 col1.metric("Total SKU-Store-Week Cells", f"{total_cells:,}")
 col2.metric("Cells with Sales",           f"{sold_cells:,}")
 col3.metric("Availability Rate",          f"{avail_rate:.1f}%")
-
-# test
