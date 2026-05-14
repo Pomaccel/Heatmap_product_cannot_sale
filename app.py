@@ -4,6 +4,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from itertools import product
 import io
+import hashlib
 
 # --- 0. Page Configuration ---
 st.set_page_config(
@@ -12,9 +13,271 @@ st.set_page_config(
     layout="wide"
 )
 
+# ============================================================
+# LOGIN SYSTEM
+# ============================================================
+
+LOGIN_CSS = """
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+/* ── Reset & base ── */
+[data-testid="stAppViewContainer"] {
+    background: #0d0f14;
+}
+[data-testid="stHeader"] { background: transparent; }
+[data-testid="stToolbar"] { display: none; }
+
+/* ── Login wrapper ── */
+.login-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 88vh;
+    font-family: 'DM Sans', sans-serif;
+}
+
+/* ── Card ── */
+.login-card {
+    background: #13161e;
+    border: 1px solid #1f2535;
+    border-radius: 16px;
+    padding: 48px 44px 40px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03);
+}
+
+/* ── Brand bar ── */
+.login-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 32px;
+}
+.login-brand-icon {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 4px 14px rgba(59,130,246,0.35);
+}
+.login-brand-name {
+    font-size: 15px; font-weight: 600;
+    color: #e2e8f0; letter-spacing: 0.01em;
+}
+.login-brand-sub {
+    font-size: 11px; color: #4a5568;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.05em; text-transform: uppercase;
+}
+
+/* ── Headline ── */
+.login-headline {
+    font-size: 22px; font-weight: 600;
+    color: #f1f5f9;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+}
+.login-sub {
+    font-size: 13.5px; color: #64748b;
+    margin-bottom: 28px;
+    line-height: 1.5;
+}
+
+/* ── Divider ── */
+.login-divider {
+    height: 1px; background: #1f2535;
+    margin-bottom: 28px;
+}
+
+/* ── Error banner ── */
+.login-error {
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.25);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px; color: #fca5a5;
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+}
+
+/* ── Streamlit input overrides (inside card) ── */
+.stTextInput > label {
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 12.5px !important;
+    font-weight: 500 !important;
+    color: #94a3b8 !important;
+    letter-spacing: 0.04em !important;
+    text-transform: uppercase !important;
+    margin-bottom: 4px !important;
+}
+.stTextInput > div > div > input {
+    background: #0d0f14 !important;
+    border: 1px solid #1f2535 !important;
+    border-radius: 8px !important;
+    color: #e2e8f0 !important;
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 14px !important;
+    padding: 10px 14px !important;
+    transition: border-color 0.15s ease !important;
+}
+.stTextInput > div > div > input:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.15) !important;
+}
+.stTextInput > div > div > input::placeholder { color: #334155 !important; }
+
+/* ── Login button ── */
+.stButton > button {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.02em !important;
+    padding: 11px 0 !important;
+    width: 100% !important;
+    margin-top: 8px !important;
+    cursor: pointer !important;
+    transition: opacity 0.15s ease, transform 0.1s ease !important;
+    box-shadow: 0 4px 14px rgba(37,99,235,0.4) !important;
+}
+.stButton > button:hover {
+    opacity: 0.92 !important;
+    transform: translateY(-1px) !important;
+}
+.stButton > button:active { transform: translateY(0) !important; }
+
+/* ── Footer note ── */
+.login-footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 11.5px;
+    color: #2d3748;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.03em;
+}
+
+/* ── Logout button (top-right inside app) ── */
+.logout-btn {
+    position: fixed; top: 14px; right: 16px; z-index: 9999;
+}
+</style>
+"""
+
+
+def _hash_password(pw: str) -> str:
+    return hashlib.sha256(pw.encode()).hexdigest()
+
+
+def _check_credentials(username: str, password: str) -> bool:
+    """
+    ตรวจสอบ credentials จาก st.secrets
+    รูปแบบ secrets.toml:
+        [credentials]
+        admin   = "hashed_or_plain_password"
+        analyst = "another_password"
+    """
+    try:
+        stored = st.secrets["credentials"].get(username)
+        if stored is None:
+            return False
+        # รองรับทั้ง plain text และ sha256 hash
+        if stored == password:
+            return True
+        if stored == _hash_password(password):
+            return True
+        return False
+    except Exception:
+        # ถ้าไม่มี secrets ให้ fallback demo account
+        return username == "admin" and password == "admin1234"
+
+
+def show_login_page():
+    st.markdown(LOGIN_CSS, unsafe_allow_html=True)
+
+    # Center column
+    _, col, _ = st.columns([1, 1.2, 1])
+    with col:
+        st.markdown('<div class="login-wrapper">', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="login-card">
+            <div class="login-brand">
+                <div class="login-brand-icon">📊</div>
+                <div>
+                    <div class="login-brand-name">SKU Monitor</div>
+                    <div class="login-brand-sub">Nongshim · Samyang</div>
+                </div>
+            </div>
+            <div class="login-headline">Sign in to your account</div>
+            <div class="login-sub">Enter your credentials to access the dashboard.</div>
+            <div class="login-divider"></div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # Error message
+        if st.session_state.get("login_failed"):
+            st.markdown(
+                '<div class="login-error">⚠️ &nbsp;Incorrect username or password. Please try again.</div>',
+                unsafe_allow_html=True,
+            )
+
+        username = st.text_input("Username", placeholder="Enter your username", key="login_user")
+        password = st.text_input("Password", placeholder="••••••••", type="password", key="login_pass")
+
+        if st.button("Sign In →"):
+            if _check_credentials(username.strip(), password):
+                st.session_state["authenticated"] = True
+                st.session_state["current_user"]  = username.strip()
+                st.session_state["login_failed"]  = False
+                st.rerun()
+            else:
+                st.session_state["login_failed"] = True
+                st.rerun()
+
+        st.markdown(
+            '<div class="login-footer">🔒 &nbsp;Secured · Internal Use Only</div>',
+            unsafe_allow_html=True,
+        )
+        st.markdown("</div>", unsafe_allow_html=True)
+
+
+def logout():
+    st.session_state["authenticated"] = False
+    st.session_state["current_user"]  = None
+    st.session_state["login_failed"]  = False
+    st.rerun()
+
+
+# ============================================================
+# AUTHENTICATION GATE
+# ============================================================
+
+if "authenticated" not in st.session_state:
+    st.session_state["authenticated"] = False
+
+if not st.session_state["authenticated"]:
+    show_login_page()
+    st.stop()
+
+# ============================================================
+# MAIN APP (เหมือนเดิมทุกอย่าง — เพิ่มแค่ logout button)
+# ============================================================
+
+# --- Logout button ที่ sidebar ---
+with st.sidebar:
+    st.markdown("---")
+    user_label = st.session_state.get("current_user", "User")
+    st.caption(f"👤 Signed in as **{user_label}**")
+    if st.button("🚪 Sign Out", use_container_width=True):
+        logout()
+
 # --- 1. Data Loading & Processing ---
-# FIX: ใช้ bytes เป็น cache key แทน file object โดยตรง
-#      เพราะ Streamlit Cloud hash UploadedFile ไม่ได้ระหว่าง session rerun
 @st.cache_data(show_spinner="🔄 Processing data...")
 def process_data(file_bytes: bytes, file_name: str) -> pd.DataFrame | None:
     try:
@@ -23,7 +286,6 @@ def process_data(file_bytes: bytes, file_name: str) -> pd.DataFrame | None:
         else:
             df = pd.read_csv(io.BytesIO(file_bytes))
 
-        # Validate required columns
         required_cols = {"sku_id", "store_id", "sales", "week_id"}
         missing = required_cols - set(df.columns)
         if missing:
@@ -35,11 +297,8 @@ def process_data(file_bytes: bytes, file_name: str) -> pd.DataFrame | None:
         df["sales"]    = pd.to_numeric(df["sales"], errors="coerce").fillna(0)
         df["week_id"]  = df["week_id"].astype(str).str.strip()
 
-        # Optional: store_name column
         if "store_name" not in df.columns:
             df["store_name"] = df["store_id"]
-
-        # Optional: upc_dsc column
         if "upc_dsc" not in df.columns:
             df["upc_dsc"] = df["sku_id"]
 
@@ -78,7 +337,6 @@ if not uploaded_file:
     st.info("👋 Please upload your data file (.parquet or .csv) in the sidebar to get started.")
     st.stop()
 
-# FIX: อ่าน bytes ครั้งเดียวแล้วส่งเข้า cache แทน file object
 file_bytes = uploaded_file.read()
 df_raw = process_data(file_bytes, uploaded_file.name)
 
@@ -131,9 +389,8 @@ if not selected_weeks:
     st.stop()
 
 # --- 7. Build Heatmap ---
-# FIX: ตั้ง row_heights แบบ explicit แทน height * n เพื่อหลีกเลี่ยง layout พัง
 n_stores = len(selected_stores)
-row_h    = max(200, n_stores * 22)   # ปรับความสูงต่อ row ตามจำนวน Store
+row_h    = max(200, n_stores * 22)
 
 subplot_titles = [
     f"SKU: {sid}  —  {sku_names.get(sid, 'Unknown')}"
@@ -147,7 +404,6 @@ fig = make_subplots(
     vertical_spacing=0.04,
 )
 
-# FIX: กรอง df ทั้งก้อนก่อน loop เพื่อลด overhead
 df_filtered = df_raw[
     df_raw["week_id"].isin(selected_weeks) &
     df_raw["store_id"].isin(selected_stores)
@@ -158,7 +414,6 @@ sorted_weeks = sorted(selected_weeks)
 for i, sku in enumerate(target_skus):
     sku_df = df_filtered[df_filtered["sku_id"] == sku][["week_id", "store_id", "sales"]]
 
-    # Cartesian grid: ทุก (week, store) ต้องมีแถว
     grid = pd.DataFrame(
         list(product(sorted_weeks, selected_stores)),
         columns=["week_id", "store_id"],
@@ -175,7 +430,6 @@ for i, sku in enumerate(target_skus):
         .reindex(columns=sorted_weeks)
     )
 
-    # Hover text: แสดง actual sales value
     sales_pivot = (
         grid.pivot(index="store_display", columns="week_id", values="sales")
         .fillna(0)
@@ -214,10 +468,9 @@ fig.update_layout(
     font=dict(size=11),
 )
 
-# FIX: ใช้ use_container_width=True เสมอ เพื่อ responsive บน Cloud
 st.plotly_chart(fig, use_container_width=True)
 
-# --- 8. Summary Metrics (Bonus) ---
+# --- 8. Summary Metrics ---
 st.markdown("---")
 col1, col2, col3 = st.columns(3)
 total_cells  = len(target_skus) * len(selected_stores) * len(selected_weeks)
