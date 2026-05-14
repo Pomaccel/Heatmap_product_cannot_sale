@@ -213,9 +213,14 @@ page = st.sidebar.radio(
     help="เลือก Brand และจำนวน SKU ที่ต้องการวิเคราะห์"
 )
 
-available_weeks  = sorted(df_raw["week_id"].unique(), reverse=True)
-default_weeks    = available_weeks[:8] if len(available_weeks) >= 8 else available_weeks
-selected_weeks   = st.sidebar.multiselect(
+# FIX: sort แบบ numeric เพื่อให้ '202619' > '202618' ถูกต้องเสมอ
+available_weeks = sorted(
+    df_raw["week_id"].unique(),
+    key=lambda x: int(x),
+    reverse=True
+)
+default_weeks   = available_weeks[:8] if len(available_weeks) >= 8 else available_weeks
+selected_weeks  = st.sidebar.multiselect(
     "Select Week ID:",
     options=available_weeks,
     default=default_weeks,
@@ -270,7 +275,8 @@ df_filtered = df_raw[
     df_raw["store_id"].isin(selected_stores)
 ].copy()
 
-sorted_weeks = sorted(selected_weeks)
+# FIX: sort แบบ numeric ไม่ใช่ lexicographic
+sorted_weeks = sorted(selected_weeks, key=lambda x: int(x))
 
 for i, sku in enumerate(target_skus):
     sku_df = df_filtered[df_filtered["sku_id"] == sku][["week_id", "store_id", "sales"]]
@@ -288,7 +294,7 @@ for i, sku in enumerate(target_skus):
     h_df = (
         grid.pivot(index="store_display", columns="week_id", values="status")
         .fillna(0)
-        .reindex(columns=sorted_weeks)
+        .reindex(columns=sorted_weeks)   # FIX: บังคับลำดับ column ตาม sorted_weeks
     )
 
     sales_pivot = (
@@ -316,6 +322,14 @@ for i, sku in enumerate(target_skus):
             xgap=2,
             ygap=1,
         ),
+        row=i + 1,
+        col=1,
+    )
+
+    # FIX: บังคับ Plotly ไม่ให้ re-sort แกน X เอง
+    fig.update_xaxes(
+        categoryorder="array",
+        categoryarray=sorted_weeks,
         row=i + 1,
         col=1,
     )
