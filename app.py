@@ -125,45 +125,55 @@ DARK_APP_CSS = """
 [data-testid="stAppViewContainer"]  { background: #0d0f14; }
 [data-testid="stHeader"]            { background: #0d0f14; border-bottom: 1px solid #1f2535; }
 [data-testid="stMain"]              { background: #0d0f14; }
-section[data-testid="stMain"] *     { color: #e2e8f0; font-family: 'DM Sans', sans-serif; }
+section[data-testid="stMain"] *     { color: #f0f4f8; font-family: 'DM Sans', sans-serif; }
 
 /* Sidebar */
 [data-testid="stSidebar"] {
     background: #13161e !important;
     border-right: 1px solid #1f2535;
 }
-[data-testid="stSidebar"] * { color: #cbd5e1 !important; }
+/* Sidebar text ทั่วไป — สว่างพอ contrast ดี */
+[data-testid="stSidebar"] * { color: #e8edf2 !important; }
+
+/* Sidebar section labels (SELECT WEEK ID, ANALYSIS MODE ฯลฯ) */
 [data-testid="stSidebar"] .stSelectbox label,
 [data-testid="stSidebar"] .stMultiSelect label,
 [data-testid="stSidebar"] .stRadio label,
 [data-testid="stSidebar"] .stFileUploader label {
-    color: #94a3b8 !important;
+    color: #a8b8cc !important;
     font-size: 12px !important;
     font-weight: 600 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.05em !important;
 }
 
+/* Sidebar radio options */
+[data-testid="stSidebar"] .stRadio [data-testid="stMarkdownContainer"] p {
+    color: #dce6f0 !important;
+    font-size: 13.5px !important;
+    font-weight: 400 !important;
+}
+
 /* Sidebar inputs */
 [data-testid="stSidebar"] .stSelectbox > div > div,
 [data-testid="stSidebar"] .stMultiSelect > div > div {
     background: #0d0f14 !important;
-    border: 1px solid #2d3748 !important;
+    border: 1px solid #3a4558 !important;
     border-radius: 8px !important;
-    color: #e2e8f0 !important;
+    color: #f0f4f8 !important;
 }
 
 /* Sidebar file uploader */
 [data-testid="stSidebar"] [data-testid="stFileUploader"] {
     background: #1a1f2e !important;
-    border: 1px dashed #2d3748 !important;
+    border: 1px dashed #3a4558 !important;
     border-radius: 8px !important;
 }
 
 /* Sidebar sign-out button */
 [data-testid="stSidebar"] .stButton > button {
     background: #1a1f2e !important;
-    border: 1px solid #2d3748 !important;
+    border: 1px solid #3a4558 !important;
     color: #f87171 !important;
     border-radius: 8px !important;
     font-weight: 600 !important;
@@ -173,47 +183,50 @@ section[data-testid="stMain"] *     { color: #e2e8f0; font-family: 'DM Sans', sa
     border-color: #f87171 !important;
 }
 
-/* Headings */
-h1, h2, h3 { color: #f1f5f9 !important; letter-spacing: -0.02em; }
+/* Main headings */
+h1, h2, h3 { color: #ffffff !important; letter-spacing: -0.02em; }
+
+/* Paragraph & body text */
+p, span, div { color: #dce6f0; }
 
 /* Alert boxes */
 [data-testid="stAlert"] {
     background: #1a1f2e !important;
     border-radius: 8px !important;
-    border: 1px solid #2d3748 !important;
-    color: #e2e8f0 !important;
+    border: 1px solid #3a4558 !important;
+    color: #f0f4f8 !important;
 }
 
 /* Metric cards */
 [data-testid="metric-container"] {
     background: #13161e !important;
-    border: 1px solid #1f2535 !important;
+    border: 1px solid #2a3447 !important;
     border-radius: 12px !important;
     padding: 16px 20px !important;
 }
 [data-testid="metric-container"] [data-testid="stMetricLabel"] {
-    color: #64748b !important;
+    color: #a8b8cc !important;
     font-size: 12px !important;
     font-weight: 600 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.05em !important;
 }
 [data-testid="metric-container"] [data-testid="stMetricValue"] {
-    color: #f1f5f9 !important;
+    color: #ffffff !important;
     font-size: 28px !important;
     font-weight: 600 !important;
 }
 
 /* Caption */
-[data-testid="stCaptionContainer"] p { color: #64748b !important; }
+[data-testid="stCaptionContainer"] p { color: #a8b8cc !important; }
 
 /* Divider */
-hr { border-color: #1f2535 !important; }
+hr { border-color: #2a3447 !important; }
 
 /* Plotly chart container */
 [data-testid="stPlotlyChart"] {
     background: #13161e !important;
-    border: 1px solid #1f2535 !important;
+    border: 1px solid #2a3447 !important;
     border-radius: 12px !important;
     padding: 8px !important;
 }
@@ -221,15 +234,16 @@ hr { border-color: #1f2535 !important; }
 /* Multiselect tags */
 [data-testid="stMultiSelect"] span[data-baseweb="tag"] {
     background: #1e3a5f !important;
-    color: #93c5fd !important;
+    color: #bdd7f5 !important;
     border-radius: 6px !important;
+    font-weight: 500 !important;
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: #0d0f14; }
-::-webkit-scrollbar-thumb { background: #2d3748; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #4a5568; }
+::-webkit-scrollbar-thumb { background: #3a4558; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #5a6a82; }
 </style>
 """
 
