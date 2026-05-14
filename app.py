@@ -357,16 +357,4 @@ fig.update_layout(
 
 st.plotly_chart(fig, use_container_width=True)
 
-# --- 8. Summary Metrics ---
-st.markdown("---")
-col1, col2, col3 = st.columns(3)
-total_cells = n_skus * len(selected_stores) * len(selected_weeks)
-sold_cells  = int(
-    df_filtered[df_filtered["sku_id"].isin(target_skus)]["sales"]
-    .gt(0).sum()
-)
-avail_rate  = sold_cells / total_cells * 100 if total_cells > 0 else 0
 
-col1.metric("Total SKU-Store-Week Cells", f"{total_cells:,}")
-col2.metric("Cells with Sales",           f"{sold_cells:,}")
-col3.metric("Availability Rate",          f"{avail_rate:.1f}%")
