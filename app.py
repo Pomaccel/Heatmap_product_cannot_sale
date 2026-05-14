@@ -593,3 +593,4 @@ for annotation in fig.layout.annotations:
     annotation.font.size  = 13
 
 st.plotly_chart(fig, use_container_width=True)
+
