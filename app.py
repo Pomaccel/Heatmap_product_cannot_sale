@@ -158,7 +158,7 @@ section[data-testid="stMain"] *     { color: #f0f4f8; font-family: 'DM Sans', sa
 [data-testid="stSidebar"] .stSelectbox > div > div,
 [data-testid="stSidebar"] .stMultiSelect > div > div {
     background: #0d0f14 !important;
-    border: 1px solid #3a4558 !important;
+    border: 1px solid #5a7aa8 !important;
     border-radius: 8px !important;
     color: #f0f4f8 !important;
 }
@@ -166,14 +166,14 @@ section[data-testid="stMain"] *     { color: #f0f4f8; font-family: 'DM Sans', sa
 /* Sidebar file uploader */
 [data-testid="stSidebar"] [data-testid="stFileUploader"] {
     background: #1a1f2e !important;
-    border: 1px dashed #3a4558 !important;
+    border: 1px dashed #5a7aa8 !important;
     border-radius: 8px !important;
 }
 
 /* Sidebar sign-out button */
 [data-testid="stSidebar"] .stButton > button {
     background: #1a1f2e !important;
-    border: 1px solid #3a4558 !important;
+    border: 1px solid #5a7aa8 !important;
     color: #f87171 !important;
     border-radius: 8px !important;
     font-weight: 600 !important;
@@ -193,7 +193,7 @@ p, span, div { color: #dce6f0; }
 [data-testid="stAlert"] {
     background: #1a1f2e !important;
     border-radius: 8px !important;
-    border: 1px solid #3a4558 !important;
+    border: 1px solid #5a7aa8 !important;
     color: #f0f4f8 !important;
 }
 
@@ -455,9 +455,9 @@ for i, sku in enumerate(target_skus):
     fig.update_xaxes(
         categoryorder="array",
         categoryarray=sorted_weeks,
-        tickangle=0,                        # ตัวหนังสือตรง ไม่เอียง
-        automargin=True,                    # FIX: Plotly ขยาย margin ให้อัตโนมัติ
-        tickfont=dict(size=11),
+        tickangle=0,
+        automargin=True,
+        tickfont=dict(size=11, color="#e8edf2"),   # สีตัวหนังสือแกน X
         tickmode="array",
         tickvals=sorted_weeks,
         ticktext=sorted_weeks,
@@ -467,9 +467,9 @@ for i, sku in enumerate(target_skus):
     )
 
     fig.update_yaxes(
-        tickfont=dict(size=11),
+        tickfont=dict(size=11, color="#e8edf2"),   # สีตัวหนังสือแกน Y (store name)
         showgrid=False,
-        automargin=True,                    # FIX: Y-axis automargin ด้วย กัน store name ถูกตัด
+        automargin=True,
         row=i + 1,
         col=1,
     )
@@ -485,7 +485,12 @@ fig.update_layout(
     showlegend=False,
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(0,0,0,0)",
-    font=dict(size=12),
+    font=dict(size=12, color="#e8edf2"),   # สีตัวหนังสือ default ทั้งกราฟ
 )
+
+# สี subplot title (SKU: xxx — ชื่อสินค้า)
+for annotation in fig.layout.annotations:
+    annotation.font.color = "#ffffff"
+    annotation.font.size  = 13
 
 st.plotly_chart(fig, use_container_width=True)
