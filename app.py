@@ -322,7 +322,7 @@ for i, sku in enumerate(target_skus):
     fig.update_xaxes(
         categoryorder="array",
         categoryarray=sorted_weeks,
-        tickangle=-45,
+        tickangle=0,
         automargin=True,                    # FIX: Plotly ขยาย margin ให้อัตโนมัติ
         tickfont=dict(size=12),
         tickmode="array",
