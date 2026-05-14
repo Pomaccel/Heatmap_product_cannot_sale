@@ -193,6 +193,57 @@ section[data-testid="stMain"] *     { color: #f0f4f8; font-family: 'DM Sans', sa
     color: #6b7f99 !important;
 }
 
+/* Dropdown popup list — selectbox & multiselect (portal render นอก sidebar) */
+ul[data-testid="stSelectboxVirtualDropdown"],
+ul[role="listbox"],
+[data-baseweb="popover"],
+[data-baseweb="popover"] > div,
+[data-baseweb="menu"],
+[data-baseweb="menu"] ul,
+[data-baseweb="select"] [data-baseweb="popover"],
+[data-baseweb="list"] {
+    background: #13161e !important;
+    border: 1px solid #5a7aa8 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5) !important;
+}
+
+/* แต่ละ option ใน dropdown */
+[data-baseweb="menu"] li,
+[data-baseweb="menu"] [role="option"],
+[data-baseweb="select"] li,
+ul[role="listbox"] li {
+    background: #13161e !important;
+    color: #e8edf2 !important;
+}
+
+/* Hover state ของ option */
+[data-baseweb="menu"] li:hover,
+[data-baseweb="menu"] [role="option"]:hover,
+[data-baseweb="select"] li:hover,
+ul[role="listbox"] li:hover,
+[data-baseweb="menu"] [aria-selected="true"],
+[data-baseweb="select"] [aria-selected="true"] {
+    background: #1e3a5f !important;
+    color: #ffffff !important;
+}
+
+/* Multiselect dropdown list */
+[data-testid="stMultiSelect"] [data-baseweb="popover"],
+[data-testid="stMultiSelect"] ul {
+    background: #13161e !important;
+    border: 1px solid #5a7aa8 !important;
+    border-radius: 8px !important;
+}
+[data-testid="stMultiSelect"] li {
+    background: #13161e !important;
+    color: #e8edf2 !important;
+}
+[data-testid="stMultiSelect"] li:hover {
+    background: #1e3a5f !important;
+    color: #ffffff !important;
+}
+
 /* Sidebar sign-out button */
 [data-testid="stSidebar"] .stButton > button {
     background: #1a1f2e !important;
@@ -516,3 +567,4 @@ for annotation in fig.layout.annotations:
     annotation.font.color = "#ffffff"
     annotation.font.size  = 13
 
+st.plotly_chart(fig, use_container_width=True)
