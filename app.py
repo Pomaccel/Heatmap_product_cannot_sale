@@ -228,6 +228,31 @@ ul[role="listbox"] li:hover,
     color: #ffffff !important;
 }
 
+/* Multiselect — input box (กล่องที่แสดง tags) */
+[data-testid="stSidebar"] [data-baseweb="tag-input"],
+[data-testid="stSidebar"] [data-baseweb="input"],
+[data-testid="stSidebar"] .stMultiSelect [data-baseweb="tag-input"],
+[data-testid="stSidebar"] .stMultiSelect > div > div {
+    background: #0d0f14 !important;
+    border: 1px solid #5a7aa8 !important;
+    border-radius: 8px !important;
+    color: #e8edf2 !important;
+}
+
+/* Multiselect — scroll area ข้างใน tag-input */
+[data-testid="stSidebar"] [data-baseweb="tag-input"] > div,
+[data-testid="stSidebar"] [data-baseweb="tag-input"] input {
+    background: #0d0f14 !important;
+    color: #e8edf2 !important;
+}
+
+/* Multiselect — scroll arrow (ลูกศร ▲▼) */
+[data-testid="stSidebar"] .stMultiSelect [data-testid="stMultiSelectChevron"],
+[data-testid="stSidebar"] .stMultiSelect svg {
+    fill: #a8b8cc !important;
+    color: #a8b8cc !important;
+}
+
 /* Multiselect dropdown list */
 [data-testid="stMultiSelect"] [data-baseweb="popover"],
 [data-testid="stMultiSelect"] ul {
